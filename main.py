@@ -27,5 +27,6 @@ async def shutdown():
 def read_root():
     return {"code": 200, "message": "Resume API root!"}
 
+
 if __name__ == "__main__":
     uvicorn.run(app, port=8000, host= '0.0.0.0')
