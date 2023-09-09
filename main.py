@@ -4,7 +4,7 @@ from database import *
 import uvicorn
 
 
-app = FastAPI(title="Resume-API", description="A set of REST endpoints for servicing resume website.", version='0.1')
+app = FastAPI(title="Resume-API", description="A set of REST endpoints for servicing resume website.", version='0.2')
 app.include_router(comments.routerComments)
 
 
