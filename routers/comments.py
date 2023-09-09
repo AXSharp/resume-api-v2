@@ -4,8 +4,9 @@ from fastapi import APIRouter, Response
 from pydantic import BaseModel, Field
 from pydantic.utils import GetterDict
 from models.comments import list_comments, create_comment , delete_comment
+
 routerComments = APIRouter(
-    prefix= "/comments",
+    prefix= "/v1",
     tags=["comments"]
 )
 
@@ -37,18 +38,18 @@ class postRequest(BaseModel):
         orm_mode = True
         getter_dict = PeeweeGetterDict
 
-@routerComments.get("/",response_model=List[CommentModel] ,summary="All comments", description= "Returns list of all comments")
+@routerComments.get("/comments",response_model=List[CommentModel] ,summary="All comments", description= "Returns list of all comments")
 async def get_comments():
     return list_comments()
 
-@routerComments.post("/", response_model=List[ValidResponse], summary= "Post a new comment")
+@routerComments.post("/comments", response_model=List[ValidResponse], summary= "Post a new comment")
 async def create(comment: postRequest):
     commentDict = comment.model_dump()
     await create_comment(username=commentDict['username'], comment=commentDict['comment'])
     return {"code": 200, "message": "OK"}
 
 @routerComments.delete(
-    "/{id}", 
+    "/comments/{id}", 
     summary= "Deletes comment from database", 
     response_model= ValidResponse,
     responses= {
