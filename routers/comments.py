@@ -1,9 +1,9 @@
 import peewee
 from typing import Any, List, Union
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
 from pydantic import BaseModel, Field
 from pydantic.utils import GetterDict
-from models.comments import list_comments, create_comment
+from models.comments import list_comments, create_comment , delete_comment
 routerComments = APIRouter(
     prefix= "/comments",
     tags=["comments"]
@@ -29,9 +29,6 @@ class CommentModel(BaseModel):
 class ValidResponse(BaseModel):
     code: int = Field(examples=[200])
     message: str = Field(examples=["OK"])
-    class Config: 
-        orm_mode = True
-        getter_dict = PeeweeGetterDict
         
 class postRequest(BaseModel):
     username: str
@@ -48,7 +45,24 @@ async def get_comments():
 async def create(comment: postRequest):
     commentDict = comment.model_dump()
     await create_comment(username=commentDict['username'], comment=commentDict['comment'])
-    return [{"code": 200, "message": "OK"}]
+    return {"code": 200, "message": "OK"}
+
+@routerComments.delete(
+    "/{id}", 
+    summary= "Deletes comment from database", 
+    response_model= ValidResponse,
+    responses= {
+        200: {"content" : {"code": 200, "message": "Comment deleted successfuly!"}},
+        404: {"content ": {"code": 404, "message": "Comment not found!"}},
+    },)
+async def delete(id: int):
+    del_comment = delete_comment(id)
+    print(del_comment)
+    if del_comment == 0:
+        return {"code": 404, "message": "Comment not found!"}
+    return {"code": 200, "message": "Comment deleted successfuly!"}
+
+
 
 # @routerComments.post("/test", description= "endpoint for sandbox testing!")
 # def playground(comment: CommentModel):

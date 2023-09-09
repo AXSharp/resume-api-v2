@@ -30,5 +30,5 @@ async def create_comment(username: str, comment:str):
 def list_comments(skip: int = 0, limit: int = 100):
     return list(Comment.select().offset(skip).limit(limit))
 
-
-    
+def delete_comment (id:int):
+    return Comment.delete().where(Comment.id == id).execute()
