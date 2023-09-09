@@ -3,7 +3,7 @@ from typing import Any, List, Union
 from fastapi import APIRouter, Response
 from pydantic import BaseModel, Field
 from pydantic.utils import GetterDict
-from models.comments import list_comments, create_comment , delete_comment
+from models.comments import list_comments, create_comment , delete_comment, update_comment
 
 routerComments = APIRouter(
     prefix= "/v1",
@@ -38,6 +38,11 @@ class postRequest(BaseModel):
         orm_mode = True
         getter_dict = PeeweeGetterDict
 
+class putRequest(BaseModel):
+    username: Union[str, None] = None
+    comment: Union[str, None] = None
+
+
 @routerComments.get("/comments",response_model=List[CommentModel] ,summary="All comments", description= "Returns list of all comments")
 async def get_comments():
     return list_comments()
@@ -63,7 +68,11 @@ async def delete(id: int):
         return {"code": 404, "message": "Comment not found!"}
     return {"code": 200, "message": "Comment deleted successfuly!"}
 
-
+@routerComments.put("/comments/{id}", response_model= ValidResponse, summary= "Updates comment by Id field")
+async def put_comment(id, payload: putRequest):
+    payload_dict = payload.model_dump()
+    update_comment(id, payload_dict['comment'], payload_dict['username'])
+    return {"code": 200, "message": "OK"}
 
 # @routerComments.post("/test", description= "endpoint for sandbox testing!")
 # def playground(comment: CommentModel):
