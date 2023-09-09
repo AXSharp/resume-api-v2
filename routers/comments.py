@@ -42,7 +42,7 @@ class postRequest(BaseModel):
 async def get_comments():
     return list_comments()
 
-@routerComments.post("/comments", response_model=List[ValidResponse], summary= "Post a new comment")
+@routerComments.post("/comments", response_model= ValidResponse, summary= "Post a new comment")
 async def create(comment: postRequest):
     commentDict = comment.model_dump()
     await create_comment(username=commentDict['username'], comment=commentDict['comment'])

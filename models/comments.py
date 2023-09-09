@@ -32,3 +32,4 @@ def list_comments(skip: int = 0, limit: int = 100):
 
 def delete_comment (id:int):
     return Comment.delete().where(Comment.id == id).execute()
+
