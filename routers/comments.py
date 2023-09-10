@@ -1,6 +1,6 @@
 import peewee
 from typing import Any, List, Union
-from fastapi import APIRouter, Response
+from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from pydantic.utils import GetterDict
 from models.comments import list_comments, create_comment , delete_comment, update_comment
