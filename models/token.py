@@ -12,10 +12,17 @@ with open('config.yaml', 'r') as file:
     config = yaml.safe_load(file)
 
 client_id = config['jwt']['client_id']
+algorithm = config['jwt']['algorithm']
+secret = config['jwt']['secret']
 
 def getTime():
     return str(time.time())[:10]
 
+def validity():
+    timeStr = int(getTime())
+    addTime = 1800 # 3 mins
+    return str(timeStr + addTime)
+    
 class ApiKey(BaseModel):
     id = IntegerField()
     client_id = CharField(max_length=30)
@@ -69,8 +76,9 @@ def generate_jwt(client_id:str, client_secret:str):
     print(userData)
     if userData !=None:
         user_dict = json.loads(userData)
+        json_obj = {"username": user_dict['username'], "client_id": user_dict['client_id'],"timeStamp": getTime(), "validUntil": validity()}
         if client_id == user_dict['client_id'] and client_secret == user_dict['client_secret']:
-            encoded_jwt = jwt.encode({"username": user_dict['username'], "client_id": user_dict['client_id'],"timeStamp": getTime()}, "secret", algorithm="HS256")
+            encoded_jwt = jwt.encode(json_obj, secret, algorithm=algorithm)
             return encoded_jwt
     else: 
         return {"code": "401", "message" : "Invalid clientId or secret!"}
