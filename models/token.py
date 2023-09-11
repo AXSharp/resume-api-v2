@@ -22,7 +22,16 @@ def validity():
     timeStr = int(getTime())
     addTime = 1800 # 3 mins
     return str(timeStr + addTime)
-    
+
+def get_random_string(length):
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
+
+def validateJwt(token:str):
+    jsonObj =jwt.decode(token, secret, algorithms=[algorithm])
+    return jsonObj
+  
 class ApiKey(BaseModel):
     id = IntegerField()
     client_id = CharField(max_length=30)
@@ -32,12 +41,7 @@ class ApiKey(BaseModel):
     
     class Meta:
         db_table = 'apiKeys'
-        
 
-def get_random_string(length):
-    letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(length))
-    return result_str
 
 def find_user(username = None, client_id = None):
     if username != None:

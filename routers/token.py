@@ -1,6 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Header
 from models.token import create_user, generate_jwt
 from pydantic import BaseModel
+from typing import Union
+from typing_extensions import Annotated
 import yaml
 
 with open('config.yaml', 'r') as file:
@@ -31,6 +33,7 @@ def user(user: userRequest):
     return create_user(userDict['username'], userDict['password'])
 
 
-@routerJwt.get("/token", summary="generates JWT token for user")
-def get_token(client_id: str, client_secret:str):
-    return generate_jwt(client_id, client_secret)
+@routerJwt.post("/token", summary="generates JWT token for user")
+def get_token(client_id: Annotated[str, Header()], client_secret: Annotated[str, Header()]):
+    token = generate_jwt(client_id, client_secret)
+    return {"access_token": token, "token_type": "bearer"}
