@@ -1,8 +1,6 @@
 from fastapi import APIRouter
-from models.token import create_user, generate_jwt, find_user
-from pydantic import BaseModel, Field
-import json
-import jwt
+from models.token import create_user, generate_jwt
+from pydantic import BaseModel
 import yaml
 
 with open('config.yaml', 'r') as file:
