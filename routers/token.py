@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from models.token import create_user, generate_jwt
+from models.token import create_user, generate_jwt, find_user
 from pydantic import BaseModel, Field
+import json
 import jwt
 import yaml
 
@@ -33,5 +34,5 @@ def user(user: userRequest):
 
 
 @routerJwt.get("/token", summary="generates JWT token for user")
-def get_token(client_id: str, client_secret:str):   
+def get_token(client_id: str, client_secret:str):
     return generate_jwt(client_id, client_secret)
