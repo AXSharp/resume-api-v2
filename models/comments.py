@@ -33,3 +33,12 @@ def list_comments(skip: int = 0, limit: int = 100):
 def delete_comment (id:int):
     return Comment.delete().where(Comment.id == id).execute()
 
+def update_comment (id: int, comment:str, username:str):
+    row = Comment.get(Comment.id == id)
+    if comment != None:
+        row.comment = comment
+    if username != None:
+        row.username = username
+    row.timestamp = getTime()
+    row.save()
+    return row

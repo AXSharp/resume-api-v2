@@ -1,11 +1,12 @@
 from fastapi import FastAPI
-from routers import comments
+from routers import comments, token
 from database import *
 import uvicorn
 
 
-app = FastAPI(title="Resume-API", description="A set of REST endpoints for servicing resume website.", version='0.2')
+app = FastAPI(title="Resume-API", description="A set of REST endpoints for servicing resume website.", version='0.3')
 app.include_router(comments.routerComments)
+app.include_router(token.routerJwt)
 
 
 
