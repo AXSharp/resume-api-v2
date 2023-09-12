@@ -29,9 +29,11 @@ def get_random_string(length):
     return result_str
 
 def validateJwt(token:str):
-    jsonObj =jwt.decode(token, secret, algorithms=[algorithm])
-    return jsonObj
-  
+    try:
+        token = token.replace("Bearer ", '')
+        jsonObj =jwt.decode(token, secret, algorithms=[algorithm])
+        return jsonObj
+    except: return None
 class ApiKey(BaseModel):
     id = IntegerField()
     client_id = CharField(max_length=30)
@@ -83,7 +85,7 @@ def generate_jwt(client_id:str, client_secret:str):
         json_obj = {"username": user_dict['username'], "client_id": user_dict['client_id'],"timeStamp": getTime(), "validUntil": validity()}
         if client_id == user_dict['client_id'] and client_secret == user_dict['client_secret']:
             encoded_jwt = jwt.encode(json_obj, secret, algorithm=algorithm)
-            return encoded_jwt
+            return {"access_token": encoded_jwt}
     else: 
         return {"code": "401", "message" : "Invalid clientId or secret!"}
     
