@@ -84,13 +84,12 @@ def create_user(username: str, password: str):
 
 def generate_jwt(client_id:str, client_secret:str):
     userData = find_user(None, client_id)
-    print(userData)
     if userData !=None:
         user_dict = json.loads(userData)
         json_obj = {"username": user_dict['username'], "client_id": user_dict['client_id'],"timeStamp": getTime(), "validUntil": validity()}
         if client_id == user_dict['client_id'] and client_secret == user_dict['client_secret']:
             encoded_jwt = jwt.encode(json_obj, secret, algorithm=algorithm)
-            return {"access_token": encoded_jwt}
+            return {"access_token": encoded_jwt, "valid_until": validity()}
     else: 
-        return {"code": "401", "message" : "Invalid clientId or secret!"}
+        return raiseError(401, "Invalid clientId or secret!")
     
