@@ -1,5 +1,6 @@
 from peewee import *
 from .base import BaseModel
+from globals import raiseError
 from playhouse.shortcuts import model_to_dict
 import random
 import json
@@ -20,7 +21,7 @@ def getTime():
 
 def validity():
     timeStr = int(getTime())
-    addTime = 1800 # 3 mins
+    addTime = 1800 # 30 mins
     return str(timeStr + addTime)
 
 def get_random_string(length):
@@ -29,11 +30,15 @@ def get_random_string(length):
     return result_str
 
 def validateJwt(token:str):
+    token = token.replace("Bearer ", '')
     try:
-        token = token.replace("Bearer ", '')
         jsonObj =jwt.decode(token, secret, algorithms=[algorithm])
-        return jsonObj
-    except: return None
+    except: raiseError(401, "Invalid token!")
+    
+    if int(jsonObj['validUntil']) > int(getTime()):
+        return "ok"
+    else: raiseError(401, "Expired token!")
+    
 class ApiKey(BaseModel):
     id = IntegerField()
     client_id = CharField(max_length=30)

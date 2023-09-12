@@ -7,6 +7,7 @@ from pydantic.utils import GetterDict
 from models.comments import list_comments, create_comment , delete_comment, update_comment
 from models.token import validateJwt
 from typing_extensions import Annotated
+from globals import raiseError
 
 routerComments = APIRouter(
     prefix= "/v1",
@@ -15,8 +16,7 @@ routerComments = APIRouter(
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="http://192.168.8.51:8095/v1/jwt/token")
 
-def raiseError(code:int, message:str):
-    raise HTTPException(status_code=code, detail=message)
+
     
 class PeeweeGetterDict(GetterDict):
     def get(self, key: Any, default: Any = None):
