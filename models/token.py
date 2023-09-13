@@ -36,7 +36,9 @@ def validateJwt(token:str):
     except: raiseError(401, "Invalid token!")
     
     if int(jsonObj['validUntil']) > int(getTime()):
-        return "ok"
+        if jsonObj['adm']:
+            return "adm"
+        else: return "ok"
     else: raiseError(401, "Expired token!")
     
 class ApiKey(BaseModel):
@@ -44,7 +46,7 @@ class ApiKey(BaseModel):
     client_id = CharField(max_length=30)
     client_secret = CharField(max_length=30)
     username = CharField(max_length=30)
-    password = CharField(max_length=30)
+    adm = BooleanField()
     
     class Meta:
         db_table = 'apiKeys'
@@ -62,7 +64,9 @@ def find_user(username = None, client_id = None):
         logger("INFO", "searching user by client_id")
         try:
             userData = ApiKey.select().where(ApiKey.client_id == client_id).get()
+            logger("DEBUG", str(userData))
             jsonData = json.dumps(model_to_dict(userData))
+            logger("INFO", str(jsonData))
             return jsonData
         except:
             return None
@@ -71,12 +75,11 @@ def find_user(username = None, client_id = None):
 
 
            
-def create_user(username: str, password: str):
+def create_user(username: str):
     user_obj = ApiKey(
-        client_id = client_id,
+        client_id = get_random_string(30),
         client_secret = get_random_string(30),
         username = username,
-        password = password
     )
     
     user_obj.save()
@@ -86,7 +89,7 @@ def generate_jwt(client_id:str, client_secret:str):
     userData = find_user(None, client_id)
     if userData !=None:
         user_dict = json.loads(userData)
-        json_obj = {"username": user_dict['username'], "client_id": user_dict['client_id'],"timeStamp": getTime(), "validUntil": validity()}
+        json_obj = {"username": user_dict['username'], "client_id": user_dict['client_id'],"timeStamp": getTime(), "validUntil": validity(), "adm": user_dict['adm']}
         if client_id == user_dict['client_id'] and client_secret == user_dict['client_secret']:
             encoded_jwt = jwt.encode(json_obj, secret, algorithm=algorithm)
             return {"access_token": encoded_jwt, "valid_until": validity()}
