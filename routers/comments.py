@@ -1,13 +1,15 @@
 import peewee
 from typing import Any, List, Union
-from fastapi import APIRouter, Header, Depends, HTTPException
+from fastapi import APIRouter, Header, Depends
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel, Field
 from pydantic.utils import GetterDict
 from models.comments import list_comments, create_comment , delete_comment, update_comment
 from models.token import validateJwt
 from typing_extensions import Annotated
-from globals import raiseError
+from globals import raiseError, logger
+
+
 
 routerComments = APIRouter(
     prefix= "/v1",
@@ -50,13 +52,17 @@ class putRequest(BaseModel):
     comment: Union[str, None] = None
 
 
+
 @routerComments.get("/comments",response_model=Union[List[CommentModel], ValidResponse ] ,summary="All comments", description= "Returns list of all comments")
 async def get_comments(Authorization: Annotated[str, Depends(oauth2_scheme)]):
     token = validateJwt(Authorization)
     if token is not None:  
-        validateJwt(Authorization)    
-        return list_comments()
+        validateJwt(Authorization)
+        comments = list_comments()
+        return comments
     else: raiseError(401, "Invalid authentication credentials")
+
+
 
 @routerComments.post("/comments", response_model= ValidResponse, summary= "Post a new comment")
 async def create(comment: postRequest, Authorization: Annotated[str, Depends(oauth2_scheme)]):
@@ -66,6 +72,9 @@ async def create(comment: postRequest, Authorization: Annotated[str, Depends(oau
         await create_comment(username=commentDict['username'], comment=commentDict['comment'])
         return {"code": 200, "message": "OK"}
     else: raiseError(401, "Invalid authentication credentials")
+
+
+
 @routerComments.delete(
     "/comments/{id}", 
     summary= "Deletes comment from database", 
@@ -85,6 +94,8 @@ async def delete(id: int, Authorization: Annotated[str, Depends(oauth2_scheme)])
         return {"code": 200, "message": "Comment deleted successfuly!"}
     else: raiseError(401, "Invalid authentication credentials")
     
+
+
 @routerComments.put("/comments/{id}", response_model= ValidResponse, summary= "Updates comment by Id field")
 async def put_comment(id, payload: putRequest, Authorization: Annotated[str, Depends(oauth2_scheme)]):
     token = validateJwt(Authorization)
