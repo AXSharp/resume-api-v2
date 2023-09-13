@@ -1,6 +1,6 @@
 from peewee import *
 from .base import BaseModel
-from globals import raiseError
+from globals import raiseError, logger
 from playhouse.shortcuts import model_to_dict
 import random
 import json
@@ -52,14 +52,14 @@ class ApiKey(BaseModel):
 
 def find_user(username = None, client_id = None):
     if username != None:
-        print("searching user by username")
+        logger("INFO", "searching user by username")
         try:
             userData = list(ApiKey.get(ApiKey.username == username))
             jsonData = json.dumps(model_to_dict(userData))
             return jsonData
         except: return None
     elif client_id != None:
-        print("searching user by client_id")
+        logger("INFO", "searching user by client_id")
         try:
             userData = ApiKey.select().where(ApiKey.client_id == client_id).get()
             jsonData = json.dumps(model_to_dict(userData))

@@ -69,6 +69,7 @@ async def create(comment: postRequest, Authorization: Annotated[str, Depends(oau
     token = validateJwt(Authorization)
     if token is not None:    
         commentDict = comment.model_dump()
+        logger("INFO", "Payload: " + str(commentDict))
         await create_comment(username=commentDict['username'], comment=commentDict['comment'])
         return {"code": 200, "message": "OK"}
     else: raiseError(401, "Invalid authentication credentials")
@@ -88,7 +89,7 @@ async def delete(id: int, Authorization: Annotated[str, Depends(oauth2_scheme)])
     if token is not None: 
         validateJwt(Authorization)
         del_comment = delete_comment(id)
-        print(del_comment)
+        logger("INFO", "Deleted count: " + str(del_comment))
         if del_comment == 0:
             return raiseError(404, "Comment not found!" )
         return {"code": 200, "message": "Comment deleted successfuly!"}
@@ -102,6 +103,7 @@ async def put_comment(id, payload: putRequest, Authorization: Annotated[str, Dep
     if token is not None: 
         validateJwt(Authorization)
         payload_dict = payload.model_dump()
+        logger("INFO", "Payload: " + str(payload_dict))
         update_comment(id, payload_dict['comment'], payload_dict['username'])
         return {"code": 200, "message": "OK"}
     else: raiseError(401, "Invalid authentication credentials")

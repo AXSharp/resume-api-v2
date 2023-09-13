@@ -2,9 +2,11 @@ from fastapi import APIRouter, Header, Form
 from models.token import create_user, generate_jwt
 from pydantic import BaseModel
 from typing import Union
+from globals import logger
 from typing_extensions import Annotated
 import yaml
 import base64
+
 
 with open('config.yaml', 'r') as file:
     config = yaml.safe_load(file)
@@ -31,6 +33,8 @@ class userResponse(BaseModel):
 @routerJwt.post("/createUser", summary="creates a user for JWT validation", response_model= userResponse)
 def user(user: userRequest):
     userDict= user.model_dump()
+    logger("INFO", "Creating a new user with username: " + userDict['username'] )
+    logger ("DEBUG", "and with password: " + userDict['password'] )
     return create_user(userDict['username'], userDict['password'])
 
 
@@ -42,4 +46,5 @@ def get_token(grant_type: Annotated[str, Form()], Authorization: Annotated[str, 
     clientId = decoded_auth[0:30]
     clientSecret = decoded_auth[31:]
     token = generate_jwt(clientId, clientSecret)
+    logger("INFO", str(token))
     return  token
